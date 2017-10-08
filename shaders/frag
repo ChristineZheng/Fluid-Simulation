@@ -1,0 +1,175 @@
+uniform int outputID;
+uniform vec3 eyePos;
+varying vec3 normal;
+varying vec3 vertex;
+
+#define PI 3.1415926
+
+vec3 shadeDiffuseFromEye();
+
+vec3 shadePhong(vec3 lightPos);
+
+vec3 shadePhongGlossy(vec3 lightPos);
+
+vec3 shadePhongBronze(vec3 lightPos);
+
+vec3 shadeEnvmapReflection();
+
+void main()
+{
+    if(outputID == 0)
+    {
+        gl_FragColor = vec4(shadeDiffuseFromEye(), 1.0);
+        return;
+    }
+    if(outputID == 1)
+    {
+        gl_FragColor = vec4(shadePhong(vec3(10, 10, 10)), 1.0);
+        return;
+    }
+    if(outputID == 2)
+    {
+        // Do something interesting here for extra credit.
+        // gl_FragColor = vec4(???, 1.0);
+        // return;
+        gl_FragColor = vec4(shadePhongBronze(vec3(10, 10, 10)), 1.0);
+        return;
+    }
+    if(outputID == 3)
+    {
+        // Do something interesting here for extra credit.
+        // gl_FragColor = vec4(???, 1.0);
+        // return;
+        gl_FragColor = vec4(shadePhongGlossy(vec3(10, 10, 10)), 1.0);
+        return;
+    }
+}
+
+vec3 shadeDiffuseFromEye()
+{
+    vec3 n = normalize(normal);
+    vec3 out_vec = normalize(eyePos - vertex);
+    float diffuse = abs(dot(out_vec, n));
+    return vec3(diffuse);
+}
+
+vec3 shadePhong(vec3 lightPos)
+{
+    // TODO Part 7.
+    // TODO Compute Phong shading here. You can choose any color you like. But make
+    // TODO sure that you have noticeable specular highlights in the shading.
+    // TODO Variables to use: eyePos, lightPos, normal, vertex
+    vec3 diffuse = vec3(0.0, 0.0, 0.0);
+    vec3 ambient = vec3(1.0, 1.0, 1.0);
+    vec3 specular = vec3(0.0, 0.0, 0.0);
+
+    float MAX_DIST_SQUARED = 2.5*2.5;
+
+    vec3 n = normalize(normal);
+    vec3 v = normalize(eyePos - vertex);
+    vec3 l = normalize(lightPos - vertex);
+    vec3 h = normalize(v + l);
+    float dist = min(dot(l, l), MAX_DIST_SQUARED) / MAX_DIST_SQUARED;
+    float distFactor = 1.0 - dist;
+
+
+    // DIFFUSE
+    float kd = 0.5;
+    float diffuseDot = dot(n,l);
+    diffuse += kd * clamp(diffuseDot, 0.0, 1.0) * distFactor;
+
+    // AMBIENT
+    float ka = 0.1;
+    ambient *= ka;
+
+    //SPECULAR
+    float ks = 0.5;
+    float p = 64.0;
+    float specularDot = dot(n,h);
+    specular += ks*pow(clamp(specularDot, 0.0, 1.0), p) * distFactor;
+
+    return clamp(diffuse + ambient + specular, 0.0, 1.0);
+
+//    return vec3(0, 0, 0);
+}
+
+vec3 shadePhongGlossy(vec3 lightPos)
+{
+    // TODO Part 7.
+    // TODO Compute Phong shading here. You can choose any color you like. But make
+    // TODO sure that you have noticeable specular highlights in the shading.
+    // TODO Variables to use: eyePos, lightPos, normal, vertex
+    vec3 diffuse = vec3(0.0, 0.0, 0.0);
+    vec3 ambient = vec3(1.0, 1.0, 1.0);
+    vec3 specular = vec3(0.0, 0.0, 0.0);
+
+    float MAX_DIST_SQUARED = 2.0*2.0;
+
+    vec3 n = normalize(normal);
+    vec3 v = normalize(eyePos - vertex);
+    vec3 l = normalize(lightPos - vertex);
+    vec3 h = normalize(v + l);
+    float dist = min(dot(l, l), MAX_DIST_SQUARED) / MAX_DIST_SQUARED;
+    float distFactor = 1.0 - dist;
+
+
+    // DIFFUSE
+    float kd = 0.2;
+    float diffuseDot = dot(n,l);
+    diffuse += kd * clamp(diffuseDot, 0.0, 1.0) * distFactor;
+
+    // AMBIENT
+    float ka = 0.15;
+    ambient *= ka;
+
+    //SPECULAR
+    float ks = 0.9;
+    float p = 512.0;
+    float specularDot = dot(n,h);
+    specular += ks*pow(clamp(specularDot, 0.0, 1.0), p) * distFactor;
+
+    return clamp(diffuse + ambient + specular, 0.0, 1.0);
+
+    //    return vec3(0, 0, 0);
+}
+
+vec3 shadePhongBronze(vec3 lightPos)
+{
+    // TODO Part 7.
+    // TODO Compute Phong shading here. You can choose any color you like. But make
+    // TODO sure that you have noticeable specular highlights in the shading.
+    // TODO Variables to use: eyePos, lightPos, normal, vertex
+    vec3 COLOR = vec3(205.0, 127.0, 50.0)/255.0;
+    vec3 diffuse = vec3(0.0, 0.0, 0.0);
+    vec3 ambient = vec3(1.0, 1.0, 1.0);
+    vec3 specular = vec3(0.0, 0.0, 0.0);
+
+    float MAX_DIST_SQUARED = 2.5*2.5;
+
+    vec3 n = normalize(normal);
+    vec3 v = normalize(eyePos - vertex);
+    vec3 l = normalize(lightPos - vertex);
+    vec3 h = normalize(v + l);
+    float dist = min(dot(l, l), MAX_DIST_SQUARED) / MAX_DIST_SQUARED;
+    float distFactor = 1.0 - dist;
+
+
+    // DIFFUSE
+    float kd = 0.8;
+    float diffuseDot = dot(n,l);
+    diffuse += kd * clamp(diffuseDot, 0.0, 1.0) * distFactor;
+
+    // AMBIENT
+    float ka = 0.1;
+    ambient *= ka;
+
+    //SPECULAR
+    float ks = 0.8;
+    float p = 128.0;
+    float specularDot = dot(n,h);
+    specular += ks*pow(clamp(specularDot, 0.0, 1.0), p) * distFactor;
+
+    return clamp(COLOR*(diffuse + specular + ambient), 0.0, 1.0);
+
+    //    return vec3(0, 0, 0);
+}
